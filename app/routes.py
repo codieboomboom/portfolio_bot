@@ -1,6 +1,7 @@
 import requests
 from flask import request, current_app
 from config import Config
+from app.controllers import add_asset
 
 
 @app.route("/webhook/entry", methods=["POST"])
@@ -13,7 +14,19 @@ def webhook_handler():
         text = message.get("text", "").strip().lower()
         if text == "add":
             # For adding portfolio entries
-            pass
+            # Inline keyboard to choose type of asset to add
+            keyboard = [
+                [InlineKeyboardButton("Stocks", callback_data="ADD_STOCK")],
+                [InlineKeyboardButton("Cryptos", callback_data="ADD_CRYPTO")],
+                [InlineKeyboardButton("Mutual Funds", callback_data="ADD_FUNDS")],
+                [InlineKeyboardButton("Cancel", callback_data="CANCEL")],
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            send_message(
+                chat_id,
+                "Select type of asset and input [SYMBOL] [QUANTITY] [MARKET(for Stock)]:",
+                reply_markup=reply_markup,
+            )
         elif text == "update":
             # For adjusting portfolio entries
             pass
@@ -28,6 +41,22 @@ def webhook_handler():
             pass
         else:
             send_message(chat_id, "I'm not quite sure what you meant. Try /help")
+    elif "callback_query" in update:
+        query = update["callback_query"]
+        chat_id = query["message"]["chat"]["id"]
+        message_id = query["message"]["message_id"]
+        data = query["data"]
+        if data.starts_with("CANCEL"):
+            pass
+        elif data.starts_with("ADD"):
+            # Extract information
+            text = query["message"].text
+            symbol = text.split()[0]
+            quantity = text.split()[1]
+            # Delegate to handler
+            status = add_asset(chat_id, symbol, quantity, data, text.split()[2])
+            # TODO: Handle the failure case or success case
+            send_message(chat_id, "Added")
 
     return "Finished Handling POST to webhook", 200
 
