@@ -24,3 +24,6 @@ def create_app():
     migrate.init_app(app, db)
 
     return app
+
+
+from app.models import Stock, Crypto, MutualFund
