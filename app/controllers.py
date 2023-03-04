@@ -9,10 +9,10 @@ def add_asset(chat_id, symbol, quantity, add_mode, market=None):
             session.query(Stock).filter_by(chat_id=chat_id).first()
         )
         if existing_stock_symbol_in_portfolio:
-            # Added already
             # TODO: A wrapper Error around the message so it is easier
+            db.session.close()
             return "Cannot add existing symbol in portfolio to it. Use /update instead"
-        # TODO: Validate if ticker exist in market specified
+        # TODO: Validate if ticker exist in market specified using some HTTPs
         stock_to_be_added = Stock(
             chat_id=chat_id, symbol=symbol, quantity=quantity, market=market
         )

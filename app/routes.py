@@ -16,15 +16,15 @@ def webhook_handler():
             # For adding portfolio entries
             # Inline keyboard to choose type of asset to add
             keyboard = [
-                [InlineKeyboardButton("Stocks", callback_data="ADD_STOCK")],
-                [InlineKeyboardButton("Cryptos", callback_data="ADD_CRYPTO")],
+                [InlineKeyboardButton("Stocks", callback_data="ADD_STOCKS")],
+                [InlineKeyboardButton("Cryptos", callback_data="ADD_CRYPTOS")],
                 [InlineKeyboardButton("Mutual Funds", callback_data="ADD_FUNDS")],
                 [InlineKeyboardButton("Cancel", callback_data="CANCEL")],
             ]
             reply_markup = InlineKeyboardMarkup(keyboard)
             send_message(
                 chat_id,
-                "Select type of asset and input [SYMBOL] [QUANTITY] [MARKET(for Stock)]:",
+                "Select type of asset to ADD and input [SYMBOL] [QUANTITY] [MARKET(for Stock)]:",
                 reply_markup=reply_markup,
             )
         elif text == "update":
