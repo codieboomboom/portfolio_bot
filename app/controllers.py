@@ -25,3 +25,23 @@ def add_asset(chat_id, symbol, quantity, add_mode, market=None):
         pass
     else:
         pass
+
+
+def delete_asset(chat_id, symbol, delete_mode):
+    if delete_mode == "DELETE_STOCKS":
+        db.session()
+        existing_stock_symbol_in_portfolio = (
+            session.query(Stock).filter_by(chat_id=chat_id).first()
+        )
+        if not existing_stock_symbol_in_portfolio:
+            db.session.close()
+            return "No symbol found. Cannot be deleted."
+        db.session.delete(existing_stock_symbol_in_portfolio)
+        db.session.commit()
+        db.session.close()
+    elif delete_mode == "DELETE_CRYPTOS":
+        pass
+    elif delete_mode == "DELETE_FUNDS":
+        pass
+    else:
+        pass

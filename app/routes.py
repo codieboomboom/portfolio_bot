@@ -35,7 +35,19 @@ def webhook_handler():
             pass
         elif text == "delete":
             # For deleting portfolio entries
-            pass
+            # Inline keyboard to choose type of asset to add
+            keyboard = [
+                [InlineKeyboardButton("Stocks", callback_data="DELETE_STOCKS")],
+                [InlineKeyboardButton("Cryptos", callback_data="DELETE_CRYPTOS")],
+                [InlineKeyboardButton("Mutual Funds", callback_data="DELETE_FUNDS")],
+                [InlineKeyboardButton("Cancel", callback_data="CANCEL")],
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            send_message(
+                chat_id,
+                "Select type of asset to DELETE and input [SYMBOL]. First matched entry will be removed:",
+                reply_markup=reply_markup,
+            )
         elif text == "price":
             # Check for unit price of tickers
             pass
@@ -57,6 +69,14 @@ def webhook_handler():
             status = add_asset(chat_id, symbol, quantity, data, text.split()[2])
             # TODO: Handle the failure case or success case
             send_message(chat_id, "Added")
+        elif data.starts_with("DELETE"):
+            # Extract information
+            text = query["message"].text
+            symbol = text.split()[0]
+            # Delegate to handler
+            status = delete_asset(chat_id, symbol, data)
+            # TODO: Handle the failure case or success case
+            send_message(chat_id, "Deleted")
 
     return "Finished Handling POST to webhook", 200
 
