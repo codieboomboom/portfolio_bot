@@ -1,11 +1,11 @@
 from app import db
-from app.Model import Stock, Crypto, MutualFund
+from app.models import Stock, Crypto, MutualFund
 
 
 def add_asset(chat_id, symbol, quantity, add_mode, market=None):
     if add_mode == "ADD_STOCKS":
         existing_stock_symbol_in_portfolio = (
-            session.query(Stock).filter_by(chat_id=chat_id).first()
+            db.session.query(Stock).filter_by(chat_id=chat_id).first()
         )
         if existing_stock_symbol_in_portfolio:
             # TODO: A wrapper Error around the message so it is easier
