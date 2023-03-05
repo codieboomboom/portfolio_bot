@@ -1,16 +1,15 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from config import Config
 import logging
 
 db = SQLAlchemy()
 migrate = Migrate()
 
 
-def create_app():
+def create_app(config):
     app = Flask(__name__)
-    app.config.from_object(Config)
+    app.config.from_object(config)
 
     # Initialize Logging
     logging.basicConfig(
@@ -22,6 +21,8 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
+
+    app.logger.debug(f"Running with Config {app.config}")
 
     return app
 
