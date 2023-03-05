@@ -3,7 +3,7 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
-class ProductionConfig:
+class DevConfig:
     SECRET_KEY = os.environ.get("SECRET_KEY") or "secret-key"
     SQLALCHEMY_DATABASE_URI = os.environ.get(
         "DATABASE_URL"
@@ -19,7 +19,7 @@ class ProductionConfig:
 
 class TestConfig:
     TESTING = True
-    SQLALCHEMY_DATABASE_URI = "sqlite://"
+    SQLALCHEMY_DATABASE_URI = "sqlite:///test.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     def __repr__(self):
