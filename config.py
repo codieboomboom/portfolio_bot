@@ -20,6 +20,7 @@ class ProductionConfig:
 class TestConfig:
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite://"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     def __repr__(self):
         return f"Config for testing"
