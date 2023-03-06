@@ -28,4 +28,4 @@ def create_app(config=DevConfig):
     return app
 
 
-from app.models import Stock, Crypto, MutualFund
+from app.models import Asset
