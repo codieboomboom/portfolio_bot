@@ -1,7 +1,12 @@
 import os
 import pytest
 from app import create_app, db, Asset
-from app.controllers import add_asset, delete_asset
+from app.controllers import (
+    add_asset,
+    delete_asset,
+    exist_asset_supported_by_yahoo_query,
+)
+from app.errors import SymbolNotSupportedError, SymbolExistedInPortfolioError
 from config import TestConfig
 
 mock_assets = [
@@ -58,27 +63,29 @@ def test_add_asset_to_non_empty_portfolio(client):
 
 
 def test_add_asset_existed_to_portfolio_failed(client):
-    asset_list_len_before = len(Asset.query.filter_by(chat_id=123).all())
-    add_asset(chat_id=123, symbol="AAPL", quantity=1)
-    asset_list_len_after = len(Asset.query.filter_by(chat_id=123).all())
-    assert asset_list_len_before == asset_list_len_after
+    with pytest.raises(SymbolExistedInPortfolioError):
+        add_asset(chat_id=123, symbol="AAPL", quantity=1)
 
 
 def test_add_asset_of_zero_quantity_to_portfolio_failed(client):
     asset_list_len_before = len(Asset.query.filter_by(chat_id=125).all())
-    # Should be non 0
     add_asset(chat_id=125, symbol="GRAB", quantity=0)
     asset_list_len_after = len(Asset.query.filter_by(chat_id=125).all())
     assert asset_list_len_before == asset_list_len_after
 
 
 def test_add_asset_with_not_existed_symbol_to_portfolio_failed(client):
-    asset_list_len_before = len(Asset.query.filter_by(chat_id=125).all())
-    # Should be US
-    add_asset(chat_id=125, symbol="GRBOB", quantity=3)
-    asset_list_len_after = len(Asset.query.filter_by(chat_id=125).all())
-    assert asset_list_len_before == asset_list_len_after
+    with pytest.raises(SymbolNotSupportedError):
+        add_asset(chat_id=125, symbol="GRBOB", quantity=3)
 
 
 def test_add_asset_dragon_capital_to_portfolio_success(client):
     pass
+
+
+def test_yahoo_query_validate_exist_asset_pass(client):
+    assert exist_asset_supported_by_yahoo_query("AAPL")
+
+
+def test_yahoo_query_validate_not_supported_asset_pass(client):
+    assert not exist_asset_supported_by_yahoo_query("GRBOB")
