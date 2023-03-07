@@ -10,6 +10,7 @@ from app.controllers import (
 from app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
+    SymbolNotExistedInPortfolioError,
     InvalidAddAssetQuantity,
 )
 from config import TestConfig
@@ -43,6 +44,9 @@ def app():
 @pytest.fixture
 def client(app):
     return app.test_client()
+
+
+""" UNIT TESTS FOR ADD ASSET HANDLER """
 
 
 def test_add_asset_to_empty_portfolio(client):
@@ -102,6 +106,55 @@ def test_add_asset_with_not_existed_symbol_to_portfolio_failed(client):
 def test_add_asset_dragon_capital_to_portfolio_success(client):
     # TODO:
     pass
+
+
+""" UNIT TESTS FOR DELETE ASSET HANDLER """
+
+
+def test_delete_asset_from_empty_portfolio_failed(client):
+    results = Asset.query.filter_by(chat_id=125).all()
+    assert len(results) == 0
+    with pytest.raises(SymbolNotExistedInPortfolioError):
+        delete_asset(chat_id=125, symbol="GRAB")
+
+
+def test_delete_asset_non_existed_asset_from_portfolio_failed(client):
+    with pytest.raises(SymbolNotExistedInPortfolioError):
+        delete_asset(chat_id=125, symbol="GRAB")
+
+
+def test_delete_asset_from_portfolio_pass(client):
+    existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    assert existed_asset is not None
+    delete_asset(chat_id=123, symbol="INTL")
+    existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    assert existed_asset is None
+
+
+def test_delete_asset_does_not_delete_other_assets_in_same_portfolio_pass(client):
+    existed_asset_to_delete = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    other_asset = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    assert existed_asset_to_delete is not None
+    assert other_asset is not None
+    delete_asset(chat_id=123, symbol="INTL")
+    existed_asset_deleted = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    other_asset = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    assert existed_asset_deleted is None
+    assert other_asset is not None
+
+
+def test_delete_asset_does_not_delete_other_assets_in_other_user_portfolio_pass(client):
+    existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    other_user_portfolio_asset = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    assert existed_asset is not None
+    assert other_user_portfolio_asset is not None
+    delete_asset(chat_id=123, symbol="INTL")
+    existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    other_user_portfolio_asset = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    assert existed_asset is None
+    assert other_user_portfolio_asset is not None
+
+""" UNIT TESTS FOR HELPER FUNCTIONS """
 
 
 def test_yahoo_query_validate_exist_asset_pass(client):

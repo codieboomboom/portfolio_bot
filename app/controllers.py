@@ -4,6 +4,7 @@ import yahooquery as yq
 from app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
+    SymbolNotExistedInPortfolioError,
     InvalidAddAssetQuantity,
 )
 
@@ -26,10 +27,10 @@ def add_asset(chat_id, symbol, quantity):
 
 def delete_asset(chat_id, symbol):
     first_existing_asset_with_symbol_in_portfolio = (
-        session.query(Asset).filter_by(chat_id=chat_id).first()
+        db.session.query(Asset).filter_by(chat_id=chat_id, symbol=symbol).first()
     )
     if not first_existing_asset_with_symbol_in_portfolio:
-        return "No symbol found. Cannot be deleted."
+        raise SymbolNotExistedInPortfolioError(symbol)
     db.session.delete(first_existing_asset_with_symbol_in_portfolio)
     db.session.commit()
 

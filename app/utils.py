@@ -1,6 +1,7 @@
 import requests
 from config import Config
 
+
 # Send message to Telegram chat with chat_id
 # TODO: Add logging here
 def send_message(chat_id, text, reply_markup=None):
