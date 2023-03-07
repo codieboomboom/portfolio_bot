@@ -41,10 +41,21 @@ def get_assets_in_portfolio(chat_id):
     result = []
     all_assets_in_portfolio = db.session.query(Asset).filter_by(chat_id=chat_id).all()
     for asset_object in all_assets_in_portfolio:
+        asset_unit_price_pair = get_regular_market_price(asset_symbol)
         asset_symbol = asset_object.symbol
         asset_qty = asset.quantity
-        asset_unit_price_pair = get_regular_market_price(asset_symbol)
-        result.append((asset_symbol, asset_qty) + asset_unit_price_pair)
+        asset_unit_price = asset_unit_price_pair[0]
+        price_currency = asset_unit_price_pair[1]
+        asset_total_value = asset_qty * asset_unit_price
+        result.append(
+            (
+                asset_symbol,
+                asset_qty,
+                asset_unit_price,
+                asset_total_value,
+                price_currency,
+            )
+        )
     return result
 
 
@@ -53,9 +64,13 @@ def get_total_worth_of_portfolio(chat_id, base_currency="USD"):
     assets = get_assets_in_portfolio(chat_id)
     total_worth = 0
     for asset in assets:
-        # TODO: Convert to base_currency
-        # convert(asset_worth, src_currency, target_currency)
-        total_worth = total_worth + asset[2]
+        asset_worth = asset[3]
+        asset_worth_currency = asset[4]
+        if asset_worth_currency != base_currency:
+            asset_worth = (
+                asset_worth * get_exchange_rate(asset_worth_currency, base_currency)[0]
+            )
+        total_worth = total_worth + asset_worth
 
     return (total_worth, base_currency)
 
@@ -82,3 +97,8 @@ def validate_exist_asset_supported_by_yahoo_query(symbol):
 def validate_qty_positive_non_zero(qty):
     # TODO: Which scenario does not work?
     return qty > 0.00
+
+
+def get_exchange_rate(src_currency, dst_currency):
+    symbol = src_currency + dst_currency + "=X"
+    return get_regular_market_price(symbol)

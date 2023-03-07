@@ -1,7 +1,14 @@
 import requests
 from flask import request, current_app
 from config import Config
-from app.controllers import add_asset, delete_asset, get_regular_market_price
+from app.controllers import (
+    add_asset,
+    delete_asset,
+    get_regular_market_price,
+    get_assets_in_portfolio,
+    get_exchange_rate,
+    get_total_worth_of_portfolio,
+)
 
 
 @app.route("/webhook/entry", methods=["POST"])
@@ -32,9 +39,11 @@ def webhook_handler():
         elif cmd == "/update":
             # For adjusting portfolio entries
             pass
-        elif cmd == "/view":
+        elif cmd == "/view_portfolio":
             # For viewing portfolio entries
-            pass
+            portfolio = get_assets_in_portfolio(chat_id)
+        elif cmd == "/view_total":
+            total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
         elif cmd == "/delete":
             # For deleting portfolio entries
             # TODO: Inline keyboard to choose type of asset withou using lib
