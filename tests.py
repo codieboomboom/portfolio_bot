@@ -178,11 +178,12 @@ def test_delete_asset_that_was_deleted_failed(client):
 def test_update_asset_exist_in_portfolio_pass(client):
     asset_to_be_update = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
     qty_before = asset_to_be_update.quantity
-    update_asset(chat_id=123, symbol="INTL", quantity = 100.00)
+    update_asset(chat_id=123, symbol="INTL", quantity=100.00)
     asset_changed = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
     qty_after = asset_changed.quantity
     assert qty_after != qty_before
     assert qty_after == 100.0
+
 
 def test_update_asset_not_exist_in_portfolio_failed(client):
     with pytest.raises(SymbolNotExistedInPortfolioError):
@@ -197,22 +198,30 @@ def test_update_asset_not_supported_failed(client):
 
 def test_update_asset_update_quantity_zero_failed(client):
     with pytest.raises(InvalidAssetQuantity):
-        update_asset(chat_id=123, symbol="INTL", quantity = 0.0000)
+        update_asset(chat_id=123, symbol="INTL", quantity=0.0000)
 
 
 def test_update_asset_update_quantity_negative_failed(client):
     with pytest.raises(InvalidAssetQuantity):
-        update_asset(chat_id=123, symbol="INTL", quantity = -0.00009)
+        update_asset(chat_id=123, symbol="INTL", quantity=-0.00009)
 
 
 def test_update_asset_not_change_other_asset_in_portfolio(client):
-    other_asset_in_portfolio_before = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
-    asset_to_update_this_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    other_asset_in_portfolio_before = Asset.query.filter_by(
+        chat_id=123, symbol="INTL"
+    ).first()
+    asset_to_update_this_portfolio = Asset.query.filter_by(
+        chat_id=123, symbol="AAPL"
+    ).first()
     qty_before = asset_to_update_this_portfolio.quantity
     qty_other_before = other_asset_in_portfolio_before.quantity
-    update_asset(chat_id=123, symbol="AAPL", quantity= 100.00)
-    other_asset_in_portfolio_after = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
-    asset_updated_this_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    update_asset(chat_id=123, symbol="AAPL", quantity=100.00)
+    other_asset_in_portfolio_after = Asset.query.filter_by(
+        chat_id=123, symbol="INTL"
+    ).first()
+    asset_updated_this_portfolio = Asset.query.filter_by(
+        chat_id=123, symbol="AAPL"
+    ).first()
     qty_after = asset_updated_this_portfolio.quantity
     qty_other_after = other_asset_in_portfolio_after.quantity
     assert qty_other_before == qty_other_after
@@ -221,11 +230,17 @@ def test_update_asset_not_change_other_asset_in_portfolio(client):
 
 
 def test_update_asset_not_change_other_users_portfolio_assets(client):
-    asset_in_other_user_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
-    asset_to_update_this_portfolio = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    asset_in_other_user_portfolio = Asset.query.filter_by(
+        chat_id=123, symbol="AAPL"
+    ).first()
+    asset_to_update_this_portfolio = Asset.query.filter_by(
+        chat_id=124, symbol="AAPL"
+    ).first()
     qty_before = asset_to_update_this_portfolio.quantity
-    update_asset(chat_id=124, symbol="AAPL", quantity= 100.00)
-    asset_updated_this_portfolio = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    update_asset(chat_id=124, symbol="AAPL", quantity=100.00)
+    asset_updated_this_portfolio = Asset.query.filter_by(
+        chat_id=124, symbol="AAPL"
+    ).first()
     qty_after = asset_updated_this_portfolio.quantity
     assert qty_before != qty_after
     assert qty_after == 100.0
@@ -233,6 +248,7 @@ def test_update_asset_not_change_other_users_portfolio_assets(client):
 
 def test_update_asset_dcds(client):
     pass
+
 
 """ UNIT TESTS FOR PRICE FUNCTIONS """
 
