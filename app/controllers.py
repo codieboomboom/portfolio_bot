@@ -35,6 +35,31 @@ def delete_asset(chat_id, symbol):
     db.session.commit()
 
 
+def get_assets_in_portfolio(chat_id):
+    # TODO: unit test
+    # TODO: Need some form of serializer to quickly produce json level?
+    result = []
+    all_assets_in_portfolio = db.session.query(Asset).filter_by(chat_id=chat_id).all()
+    for asset_object in all_assets_in_portfolio:
+        asset_symbol = asset_object.symbol
+        asset_qty = asset.quantity
+        asset_unit_price_pair = get_regular_market_price(asset_symbol)
+        result.append((asset_symbol, asset_qty) + asset_unit_price_pair)
+    return result
+
+
+def get_total_worth_of_portfolio(chat_id, base_currency="USD"):
+    # TODO: unit test
+    assets = get_assets_in_portfolio(chat_id)
+    total_worth = 0
+    for asset in assets:
+        # TODO: Convert to base_currency
+        # convert(asset_worth, src_currency, target_currency)
+        total_worth = total_worth + asset[2]
+
+    return (total_worth, base_currency)
+
+
 def get_regular_market_price(symbol):
     if validate_exist_asset_supported_by_yahoo_query(symbol):
         ticker = yq.Ticker(symbol)
