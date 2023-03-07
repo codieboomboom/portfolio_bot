@@ -6,6 +6,7 @@ from app.controllers import (
     delete_asset,
     validate_exist_asset_supported_by_yahoo_query,
     validate_qty_positive_non_zero,
+    get_regular_market_price,
 )
 from app.errors import (
     SymbolNotSupportedError,
@@ -165,6 +166,26 @@ def test_delete_asset_does_not_delete_other_assets_in_other_user_portfolio_pass(
 
 
 def test_delete_asset_that_was_deleted_failed(client):
+    # TODO:
+    pass
+
+
+""" UNIT TESTS FOR PRICE FUNCTIONS """
+
+
+def test_get_price_asset_success(client):
+    asset_symbol = "D05.SI"
+    regular_price_currency_pair = get_regular_market_price(asset_symbol)
+    assert regular_price_currency_pair is not None
+
+
+def test_get_price_not_existed_asset_failed(client):
+    not_existed_asset_symbol = "D05"
+    with pytest.raises(SymbolNotSupportedError):
+        regular_price_currency_pair = get_regular_market_price(not_existed_asset_symbol)
+
+
+def test_get_price_for_dcds_pass(client):
     # TODO:
     pass
 

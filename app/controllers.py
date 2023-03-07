@@ -35,10 +35,20 @@ def delete_asset(chat_id, symbol):
     db.session.commit()
 
 
+def get_regular_market_price(symbol):
+    if validate_exist_asset_supported_by_yahoo_query(symbol):
+        ticker = yq.Ticker(symbol)
+        resp_dict = ticker.price
+        return resp_dict[symbol]["regularMarketPrice"], resp_dict[symbol]["currency"]
+    else:
+        # TODO: Check via other sources. For now just raise error
+        raise SymbolNotSupportedError(symbol)
+
+
 def validate_exist_asset_supported_by_yahoo_query(symbol):
     ticker = yq.Ticker(symbol)
     resp_dict = ticker.quote_type
-    if "quoteType" in resp_dict[list(resp_dict.keys())[0]]:
+    if "quoteType" in resp_dict[symbol]:
         return True
     else:
         return False

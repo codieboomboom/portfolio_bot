@@ -1,7 +1,7 @@
 import requests
 from flask import request, current_app
 from config import Config
-from app.controllers import add_asset
+from app.controllers import add_asset, delete_asset, get_regular_market_price
 
 
 @app.route("/webhook/entry", methods=["POST"])
@@ -11,10 +11,12 @@ def webhook_handler():
     if "message" in update:
         message = update["message"]
         chat_id = message["chat"]["id"]
-        text = message.get("text", "").strip().lower()
-        if text == "add":
+        text_tokenized = message.get("text", "").strip().split()
+        cmd = text_tokenized[0].lower()
+        other_user_input = text_tokenized[1].lower()
+        if cmd == "/add":
             # For adding portfolio entries
-            # Inline keyboard to choose type of asset to add
+            # TODO: Inline keyboard implementation without lib
             keyboard = [
                 [InlineKeyboardButton("Stocks", callback_data="ADD_STOCKS")],
                 [InlineKeyboardButton("Cryptos", callback_data="ADD_CRYPTOS")],
@@ -27,15 +29,15 @@ def webhook_handler():
                 "Select type of asset to ADD and input [SYMBOL] [QUANTITY] [MARKET(for Stock)]:",
                 reply_markup=reply_markup,
             )
-        elif text == "update":
+        elif cmd == "/update":
             # For adjusting portfolio entries
             pass
-        elif text == "view":
+        elif cmd == "/view":
             # For viewing portfolio entries
             pass
-        elif text == "delete":
+        elif cmd == "/delete":
             # For deleting portfolio entries
-            # Inline keyboard to choose type of asset to add
+            # TODO: Inline keyboard to choose type of asset withou using lib
             keyboard = [
                 [InlineKeyboardButton("Stocks", callback_data="DELETE_STOCKS")],
                 [InlineKeyboardButton("Cryptos", callback_data="DELETE_CRYPTOS")],
@@ -48,9 +50,13 @@ def webhook_handler():
                 "Select type of asset to DELETE and input [SYMBOL]. First matched entry will be removed:",
                 reply_markup=reply_markup,
             )
-        elif text == "price":
-            # Check for unit price of tickers
-            pass
+        elif cmd == "/price":
+            # Check for unit price of ticket
+            regular_market_price_pair = get_regular_market_price(other_user_input)
+            send_message(
+                chat_id,
+                f"Price per unit of {other_user_input} is {regular_market_price_pair[0]} {regular_market_price_pair[1]}",
+            )
         else:
             send_message(chat_id, "I'm not quite sure what you meant. Try /help")
     elif "callback_query" in update:
