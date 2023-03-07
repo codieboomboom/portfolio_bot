@@ -1,4 +1,4 @@
-from app import db
+from bot_app import db
 
 
 class Asset(db.Model):

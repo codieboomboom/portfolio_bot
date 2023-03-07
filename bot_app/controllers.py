@@ -1,7 +1,7 @@
-from app import db
-from app.models import Asset
+from bot_app import db
+from bot_app.models import Asset
 import yahooquery as yq
-from app.errors import (
+from bot_app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,

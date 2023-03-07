@@ -1,4 +1,4 @@
-from app import create_app
+from bot_app import create_app
 from config import DevConfig
 
 if __name__ == "__main__":

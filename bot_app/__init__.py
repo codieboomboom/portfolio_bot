@@ -14,18 +14,23 @@ def create_app(config=DevConfig):
 
     # Initialize Logging
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     )
-    app.logger.setLevel(logging.INFO)
+    app.logger.setLevel(logging.DEBUG)
 
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
+
+    # blueprint register
+    # Note that we can do away with blueprint too but need to put routes code here, then @app.route can work
+    app.register_blueprint(webhook_bp)
 
     app.logger.debug(f"Running with Config {app.config}")
 
     return app
 
 
-from app.models import Asset
+from bot_app import models
+from bot_app.routes import webhook_bp

@@ -1,7 +1,6 @@
 import requests
-from flask import request, current_app
-from config import Config
-from app.controllers import (
+from flask import request, Blueprint, current_app
+from bot_app.controllers import (
     add_asset,
     delete_asset,
     get_regular_market_price,
@@ -10,8 +9,10 @@ from app.controllers import (
     get_total_worth_of_portfolio,
 )
 
+webhook_bp = Blueprint("webhook_api", __name__)
 
-@app.route("/webhook/entry", methods=["POST"])
+
+@webhook_bp.route("/webhook/entry", methods=["POST"])
 def webhook_handler():
     update = request.get_json()
     # Ignore any edited message
@@ -42,8 +43,17 @@ def webhook_handler():
         elif cmd == "/view_portfolio":
             # For viewing portfolio entries
             portfolio = get_assets_in_portfolio(chat_id)
+            if portfolio == []:
+                send_message(chat_id, "Portfolio is empty")
+            else:
+                # TODO
+                send_message(chat_id, "Portfolio has things")
         elif cmd == "/view_total":
             total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
+            send_message(
+                chat_id,
+                f"Total Portfolio Value: {total_value_of_portfolio[0]}, {total_value_of_portfolio[1]} ",
+            )
         elif cmd == "/delete":
             # For deleting portfolio entries
             # TODO: Inline keyboard to choose type of asset withou using lib
@@ -96,10 +106,10 @@ def webhook_handler():
     return "Finished Handling POST to webhook", 200
 
 
-@app.route("/webhook/set", methods=["POST"])
+@webhook_bp.route("/webhook/set", methods=["POST"])
 def set_webhook():
-    telegram_url = Config.TELEGRAM_BOT_BASE_URL + "/setWebhook"
-    webhook_url = Config.WEBHOOK_URL + "/webhook" + "/entry"
+    telegram_url = current_app.config['TELEGRAM_BOT_BASE_URL'] + "/setWebhook"
+    webhook_url = current_app.config['WEBHOOK_URL'] + "/webhook" + "/entry"
     current_app.logger.debug(f"Setting webhook as {webhook_url}")
     payload = {"url": webhook_url}
 
@@ -109,9 +119,9 @@ def set_webhook():
     return "Done", 200
 
 
-@app.route("/webhook/delete", methods=["POST"])
+@webhook_bp.route("/webhook/delete", methods=["POST"])
 def delete_webhook():
-    telegram_url = Config.TELEGRAM_BOT_BASE_URL + "/deleteWebhook"
+    telegram_url = current_app.config['TELEGRAM_BOT_BASE_URL'] + "/deleteWebhook"
     current_app.logger.debug(f"Deleting webhook")
 
     resp = requests.post(telegram_url)
