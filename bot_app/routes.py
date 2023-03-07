@@ -8,6 +8,8 @@ from bot_app.controllers import (
     get_exchange_rate,
     get_total_worth_of_portfolio,
 )
+from bot_app.utils import send_message
+from bot_app.errors import SymbolNotSupportedError
 
 webhook_bp = Blueprint("webhook_api", __name__)
 
@@ -15,28 +17,20 @@ webhook_bp = Blueprint("webhook_api", __name__)
 @webhook_bp.route("/webhook/entry", methods=["POST"])
 def webhook_handler():
     update = request.get_json()
+    current_app.logger.info("Received new update via webhook!")
+    current_app.logger.debug(update)
     # Ignore any edited message
     if "message" in update:
         message = update["message"]
         chat_id = message["chat"]["id"]
-        text_tokenized = message.get("text", "").strip().split()
+        text_tokenized = message.get("text", "").split()
+        if len(text_tokenized) > 1:
+            other_user_inputs = text_tokenized[1:]
         cmd = text_tokenized[0].lower()
-        other_user_input = text_tokenized[1].lower()
         if cmd == "/add":
             # For adding portfolio entries
             # TODO: Inline keyboard implementation without lib
-            keyboard = [
-                [InlineKeyboardButton("Stocks", callback_data="ADD_STOCKS")],
-                [InlineKeyboardButton("Cryptos", callback_data="ADD_CRYPTOS")],
-                [InlineKeyboardButton("Mutual Funds", callback_data="ADD_FUNDS")],
-                [InlineKeyboardButton("Cancel", callback_data="CANCEL")],
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            send_message(
-                chat_id,
-                "Select type of asset to ADD and input [SYMBOL] [QUANTITY] [MARKET(for Stock)]:",
-                reply_markup=reply_markup,
-            )
+            pass
         elif cmd == "/update":
             # For adjusting portfolio entries
             pass
@@ -52,31 +46,28 @@ def webhook_handler():
             total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
             send_message(
                 chat_id,
-                f"Total Portfolio Value: {total_value_of_portfolio[0]}, {total_value_of_portfolio[1]} ",
+                f"Total Portfolio Value: {total_value_of_portfolio[0]:.2f} {total_value_of_portfolio[1]} ",
             )
         elif cmd == "/delete":
             # For deleting portfolio entries
             # TODO: Inline keyboard to choose type of asset withou using lib
-            keyboard = [
-                [InlineKeyboardButton("Stocks", callback_data="DELETE_STOCKS")],
-                [InlineKeyboardButton("Cryptos", callback_data="DELETE_CRYPTOS")],
-                [InlineKeyboardButton("Mutual Funds", callback_data="DELETE_FUNDS")],
-                [InlineKeyboardButton("Cancel", callback_data="CANCEL")],
-            ]
-            reply_markup = InlineKeyboardMarkup(keyboard)
-            send_message(
-                chat_id,
-                "Select type of asset to DELETE and input [SYMBOL]. First matched entry will be removed:",
-                reply_markup=reply_markup,
-            )
+            pass
         elif cmd == "/price":
             # Check for unit price of ticket
-            regular_market_price_pair = get_regular_market_price(other_user_input)
-            send_message(
-                chat_id,
-                f"Price per unit of {other_user_input} is {regular_market_price_pair[0]} {regular_market_price_pair[1]}",
-            )
+            try:
+                symbol = other_user_inputs[0]
+                regular_market_price_pair = get_regular_market_price(symbol)
+                send_message(
+                    chat_id,
+                    f"Price per unit of {symbol} is {regular_market_price_pair[0]:.2f} {regular_market_price_pair[1]}",
+                )
+            except SymbolNotSupportedError as ex:
+                send_message(
+                    chat_id,
+                    ex.message,
+                )
         else:
+            current_app.logger.info("Received unknown command")
             send_message(chat_id, "I'm not quite sure what you meant. Try /help")
     elif "callback_query" in update:
         query = update["callback_query"]
