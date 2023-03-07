@@ -36,7 +36,18 @@ def delete_asset(chat_id, symbol):
 
 
 def update_asset(chat_id, symbol, quantity):
-    pass
+    if not validate_exist_asset_supported_by_yahoo_query(symbol):
+        # TODO: try query elsewhere DCDS, VNI stocks, etc
+        raise SymbolNotSupportedError(symbol)
+    if not validate_qty_positive_non_zero(quantity):
+        raise InvalidAssetQuantity(quantity)
+    first_existing_asset_with_symbol_in_portfolio = (
+        db.session.query(Asset).filter_by(chat_id=chat_id, symbol=symbol).first()
+    )
+    if not first_existing_asset_with_symbol_in_portfolio:
+        raise SymbolNotExistedInPortfolioError(symbol)
+    first_existing_asset_with_symbol_in_portfolio.quantity = quantity
+    db.session.commit()
 
 
 def get_assets_in_portfolio(chat_id):
