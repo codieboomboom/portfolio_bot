@@ -108,8 +108,8 @@ def webhook_handler():
 
 @webhook_bp.route("/webhook/set", methods=["POST"])
 def set_webhook():
-    telegram_url = current_app.config['TELEGRAM_BOT_BASE_URL'] + "/setWebhook"
-    webhook_url = current_app.config['WEBHOOK_URL'] + "/webhook" + "/entry"
+    telegram_url = current_app.config["TELEGRAM_BOT_BASE_URL"] + "/setWebhook"
+    webhook_url = current_app.config["WEBHOOK_URL"] + "/webhook" + "/entry"
     current_app.logger.debug(f"Setting webhook as {webhook_url}")
     payload = {"url": webhook_url}
 
@@ -121,7 +121,7 @@ def set_webhook():
 
 @webhook_bp.route("/webhook/delete", methods=["POST"])
 def delete_webhook():
-    telegram_url = current_app.config['TELEGRAM_BOT_BASE_URL'] + "/deleteWebhook"
+    telegram_url = current_app.config["TELEGRAM_BOT_BASE_URL"] + "/deleteWebhook"
     current_app.logger.debug(f"Deleting webhook")
 
     resp = requests.post(telegram_url)
