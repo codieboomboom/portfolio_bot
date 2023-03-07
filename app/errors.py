@@ -42,7 +42,7 @@ class SymbolNotExistedInPortfolioError(Exception):
         super().__init__(self.message)
 
 
-class InvalidAddAssetQuantity(Exception):
+class InvalidAssetQuantity(Exception):
     """Exception raised for errors in the input quantity for the ticker.
 
     Attributes:

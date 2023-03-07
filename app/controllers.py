@@ -5,7 +5,7 @@ from app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
-    InvalidAddAssetQuantity,
+    InvalidAssetQuantity,
 )
 
 
@@ -14,7 +14,7 @@ def add_asset(chat_id, symbol, quantity):
         # TODO: try query elsewhere DCDS, VNI stocks, etc
         raise SymbolNotSupportedError(symbol)
     if not validate_qty_positive_non_zero(quantity):
-        raise InvalidAddAssetQuantity(quantity)
+        raise InvalidAssetQuantity(quantity)
     first_existing_asset_with_symbol_in_portfolio = (
         db.session.query(Asset).filter_by(chat_id=chat_id, symbol=symbol).first()
     )
@@ -33,6 +33,10 @@ def delete_asset(chat_id, symbol):
         raise SymbolNotExistedInPortfolioError(symbol)
     db.session.delete(first_existing_asset_with_symbol_in_portfolio)
     db.session.commit()
+
+
+def update_asset(chat_id, symbol, quantity):
+    pass
 
 
 def get_assets_in_portfolio(chat_id):

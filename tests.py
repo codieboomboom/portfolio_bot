@@ -4,6 +4,7 @@ from app import create_app, db, Asset
 from app.controllers import (
     add_asset,
     delete_asset,
+    update_asset,
     validate_exist_asset_supported_by_yahoo_query,
     validate_qty_positive_non_zero,
     get_regular_market_price,
@@ -12,13 +13,14 @@ from app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
-    InvalidAddAssetQuantity,
+    InvalidAssetQuantity,
 )
 from config import TestConfig
 
 mock_assets = [
     {"chat_id": 123, "symbol": "AAPL", "quantity": 10},
-    {"chat_id": 123, "symbol": "INTL", "quantity": 0},
+    {"chat_id": 123, "symbol": "INTL", "quantity": 2.0},
+    {"chat_id": 123, "symbol": "HNT-USD", "quantity": 10.0054},
     {"chat_id": 124, "symbol": "AAPL", "quantity": 1},
 ]
 
@@ -90,12 +92,12 @@ def test_add_asset_existed_to_portfolio_failed(client):
 
 
 def test_add_asset_of_zero_quantity_to_portfolio_failed(client):
-    with pytest.raises(InvalidAddAssetQuantity):
+    with pytest.raises(InvalidAssetQuantity):
         add_asset(chat_id=125, symbol="GRAB", quantity=0.00)
 
 
 def test_add_asset_of_negative_quantity_to_portfolio_failed(client):
-    with pytest.raises(InvalidAddAssetQuantity):
+    with pytest.raises(InvalidAssetQuantity):
         add_asset(chat_id=125, symbol="GRAB", quantity=-0.001)
 
 
@@ -169,6 +171,68 @@ def test_delete_asset_that_was_deleted_failed(client):
     # TODO:
     pass
 
+
+"""UNIT TESTS FOR UPDATE/CHANGE"""
+
+
+def test_update_asset_exist_in_portfolio_pass(client):
+    asset_to_be_update = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    qty_before = asset_to_be_update.quantity
+    update_asset(chat_id=123, symbol="INTL", quantity = 100.00)
+    asset_changed = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    qty_after = asset_changed.quantity
+    assert qty_after != qty_before
+    assert qty_after == 100.0
+
+def test_update_asset_not_exist_in_portfolio_failed(client):
+    with pytest.raises(SymbolNotExistedInPortfolioError):
+        update_asset(chat_id=123, symbol="BTC", quantity=10)
+
+
+def test_update_asset_not_supported_failed(client):
+    # TODO: necessary?
+    with pytest.raises(SymbolNotSupportedError):
+        update_asset(chat_id=123, symbol="BGFERFDSFS", quantity=10)
+
+
+def test_update_asset_update_quantity_zero_failed(client):
+    with pytest.raises(InvalidAssetQuantity):
+        update_asset(chat_id=123, symbol="INTL", quantity = 0.0000)
+
+
+def test_update_asset_update_quantity_negative_failed(client):
+    with pytest.raises(InvalidAssetQuantity):
+        update_asset(chat_id=123, symbol="INTL", quantity = -0.00009)
+
+
+def test_update_asset_not_change_other_asset_in_portfolio(client):
+    other_asset_in_portfolio_before = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    asset_to_update_this_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    qty_before = asset_to_update_this_portfolio.quantity
+    qty_other_before = other_asset_in_portfolio_before.quantity
+    update_asset(chat_id=123, symbol="AAPL", quantity= 100.00)
+    other_asset_in_portfolio_after = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    asset_updated_this_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    qty_after = asset_updated_this_portfolio.quantity
+    qty_other_after = other_asset_in_portfolio_after.quantity
+    assert qty_other_before == qty_other_after
+    assert qty_before != qty_after
+    assert qty_after == 100.0
+
+
+def test_update_asset_not_change_other_users_portfolio_assets(client):
+    asset_in_other_user_portfolio = Asset.query.filter_by(chat_id=123, symbol="AAPL").first()
+    asset_to_update_this_portfolio = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    qty_before = asset_to_update_this_portfolio.quantity
+    update_asset(chat_id=124, symbol="AAPL", quantity= 100.00)
+    asset_updated_this_portfolio = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    qty_after = asset_updated_this_portfolio.quantity
+    assert qty_before != qty_after
+    assert qty_after == 100.0
+
+
+def test_update_asset_dcds(client):
+    pass
 
 """ UNIT TESTS FOR PRICE FUNCTIONS """
 
