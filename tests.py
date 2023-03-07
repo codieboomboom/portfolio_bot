@@ -108,6 +108,11 @@ def test_add_asset_dragon_capital_to_portfolio_success(client):
     pass
 
 
+def test_add_asset_does_not_add_to_other_users_portfolio(client):
+    # TODO:
+    pass
+
+
 """ UNIT TESTS FOR DELETE ASSET HANDLER """
 
 
@@ -145,14 +150,24 @@ def test_delete_asset_does_not_delete_other_assets_in_same_portfolio_pass(client
 
 def test_delete_asset_does_not_delete_other_assets_in_other_user_portfolio_pass(client):
     existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
-    other_user_portfolio_asset = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    other_user_portfolio_asset = Asset.query.filter_by(
+        chat_id=124, symbol="AAPL"
+    ).first()
     assert existed_asset is not None
     assert other_user_portfolio_asset is not None
     delete_asset(chat_id=123, symbol="INTL")
     existed_asset = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
-    other_user_portfolio_asset = Asset.query.filter_by(chat_id=124, symbol="AAPL").first()
+    other_user_portfolio_asset = Asset.query.filter_by(
+        chat_id=124, symbol="AAPL"
+    ).first()
     assert existed_asset is None
     assert other_user_portfolio_asset is not None
+
+
+def test_delete_asset_that_was_deleted_failed(client):
+    # TODO:
+    pass
+
 
 """ UNIT TESTS FOR HELPER FUNCTIONS """
 
