@@ -22,7 +22,7 @@ class SymbolExistedInPortfolioError(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, symbol, message="Add symbol already existed in your portfolio"):
+    def __init__(self, symbol, message="Symbol already existed in your portfolio"):
         self.symbol = symbol
         self.message = message
         super().__init__(self.message)
@@ -36,7 +36,7 @@ class SymbolNotExistedInPortfolioError(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, symbol, message="Delete symbol not exist in your portfolio"):
+    def __init__(self, symbol, message="Symbol not found in your portfolio"):
         self.symbol = symbol
         self.message = message
         super().__init__(self.message)
