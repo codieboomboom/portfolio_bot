@@ -36,7 +36,9 @@ def webhook_handler():
                 add_asset(chat_id, symbol, qty)
                 send_message(chat_id, "Added Asset Successfully to Portfolio.")
             except IndexError:
-                send_message(chat_id, "Missing Ticker or Qty information, please try again.")
+                send_message(
+                    chat_id, "Missing Ticker or Qty information, please try again."
+                )
             except ValueError:
                 send_message(chat_id, "Quantity must be a number!")
             except Exception as ex:
@@ -52,16 +54,21 @@ def webhook_handler():
             else:
                 msg_to_send = "Current Portfolio: \n\n"
                 for asset_symbol in portfolio.keys():
-                    quantity = portfolio[asset_symbol]['quantity']
-                    unit_price = portfolio[asset_symbol]['unit_price']
-                    total_value = portfolio[asset_symbol]['total_value']
-                    currency = portfolio[asset_symbol]['currency']
-                    msg_to_send = msg_to_send + f"{asset_symbol} \nQty: {quantity:,.2f} \nPrice: {unit_price:,.2f} {currency} \nTotal: {total_value:,.2f} {currency} \n\n"
+                    quantity = portfolio[asset_symbol]["quantity"]
+                    unit_price = portfolio[asset_symbol]["unit_price"]
+                    total_value = portfolio[asset_symbol]["total_value"]
+                    currency = portfolio[asset_symbol]["currency"]
+                    msg_to_send = (
+                        msg_to_send
+                        + f"{asset_symbol} \nQty: {quantity:,.2f} \nPrice: {unit_price:,.2f} {currency} \nTotal: {total_value:,.2f} {currency} \n\n"
+                    )
                 send_message(chat_id, msg_to_send)
         elif cmd == "/total":
             if len(text_tokenized) > 1:
                 preferred_currency = other_user_inputs[0]
-                total_value_of_portfolio = get_total_worth_of_portfolio(chat_id, preferred_currency)
+                total_value_of_portfolio = get_total_worth_of_portfolio(
+                    chat_id, preferred_currency
+                )
                 # error handling for problematic input (not currency)
             else:
                 total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)

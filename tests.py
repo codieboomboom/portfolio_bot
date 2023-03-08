@@ -10,7 +10,7 @@ from bot_app.controllers import (
     validate_qty_positive_non_zero,
     get_regular_market_price,
     get_assets_in_portfolio,
-    get_total_worth_of_portfolio
+    get_total_worth_of_portfolio,
 )
 from bot_app.errors import (
     SymbolNotSupportedError,
@@ -174,7 +174,10 @@ def test_delete_asset_that_was_deleted_failed(client):
     # TODO:
     pass
 
+
 """ UNIT TESTS FOR VIEW_PORTFOLIO """
+
+
 def test_view_portfolio_empty_dictionary_return_for_empty_portfolio(client):
     result = get_assets_in_portfolio(125)
     assert result == {}
@@ -184,7 +187,8 @@ def test_view_portfolio_return_dictionary(client):
     result = get_assets_in_portfolio(123)
     assert result != {}
     symbols = result.keys()
-    assert 'AAPL' in symbols and 'INTL' in symbols and 'HNT-USD' in symbols
+    assert "AAPL" in symbols and "INTL" in symbols and "HNT-USD" in symbols
+
 
 """UNIT TESTS FOR UPDATE/CHANGE"""
 
