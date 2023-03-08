@@ -4,6 +4,7 @@ from flask import request, Blueprint, current_app
 from bot_app.controllers import (
     add_asset,
     delete_asset,
+    update_asset,
     get_regular_market_price,
     get_assets_in_portfolio,
     get_exchange_rate,
@@ -26,6 +27,8 @@ def webhook_handler():
         text_tokenized = message.get("text", "").split()
         if len(text_tokenized) > 1:
             other_user_inputs = text_tokenized[1:]
+        else:
+            other_user_inputs=[]
         cmd = text_tokenized[0].lower()
         if cmd == "/add":
             # For adding portfolio entries
@@ -75,7 +78,7 @@ def webhook_handler():
                     )
                 send_message(chat_id, msg_to_send)
         elif cmd == "/total":
-            if len(text_tokenized) > 1:
+            if other_user_inputs:
                 preferred_currency = other_user_inputs[0]
                 total_value_of_portfolio = get_total_worth_of_portfolio(
                     chat_id, preferred_currency
