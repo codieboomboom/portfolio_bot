@@ -20,7 +20,6 @@ def webhook_handler():
     update = request.get_json()
     current_app.logger.info("Received new update via webhook!")
     current_app.logger.debug(update)
-    # Ignore any edited message
     if "message" in update:
         message = update["message"]
         chat_id = message["chat"]["id"]
@@ -45,7 +44,19 @@ def webhook_handler():
                 send_message(chat_id, ex.message)
         elif cmd == "/update":
             # For adjusting portfolio entries
-            pass
+            try:
+                symbol = other_user_inputs[0]
+                qty = float(other_user_inputs[1])
+                update_asset(chat_id, symbol, qty)
+                send_message(chat_id, "Update Asset Successfully.")
+            except IndexError:
+                send_message(
+                    chat_id, "Missing Ticker or Qty information, please try again."
+                )
+            except ValueError:
+                send_message(chat_id, "Quantity must be a number!")
+            except Exception as ex:
+                send_message(chat_id, ex.message)
         elif cmd == "/assets":
             # For viewing portfolio entries
             portfolio = get_assets_in_portfolio(chat_id)
@@ -69,7 +80,7 @@ def webhook_handler():
                 total_value_of_portfolio = get_total_worth_of_portfolio(
                     chat_id, preferred_currency
                 )
-                # error handling for problematic input (not currency)
+                # error handling for problematic input (not valid currency)
             else:
                 total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
             send_message(
@@ -78,8 +89,14 @@ def webhook_handler():
             )
         elif cmd == "/delete":
             # For deleting portfolio entries
-            # TODO: Inline keyboard to choose type of asset withou using lib
-            pass
+            try:
+                symbol = other_user_inputs[0]
+                delete_asset(chat_id, symbol)
+                send_message(chat_id, f"Deleted {symbol} Successfully from Portfolio.")
+            except IndexError:
+                send_message(chat_id, "Missing Ticker information, please try again.")
+            except Exception as ex:
+                send_message(chat_id, ex.message)
         elif cmd == "/price":
             # Check for unit price of ticket
             try:

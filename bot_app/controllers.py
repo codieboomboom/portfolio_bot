@@ -52,8 +52,6 @@ def update_asset(chat_id, symbol, quantity):
 
 
 def get_assets_in_portfolio(chat_id):
-    # TODO: unit test
-    # TODO: Need some form of serializer to quickly produce json level?
     result = {}
     all_assets_in_portfolio = db.session.query(Asset).filter_by(chat_id=chat_id).all()
     for asset_object in all_assets_in_portfolio:
