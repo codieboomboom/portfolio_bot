@@ -1,4 +1,5 @@
 import requests
+import json
 from flask import request, Blueprint, current_app
 from bot_app.controllers import (
     add_asset,
@@ -29,8 +30,17 @@ def webhook_handler():
         cmd = text_tokenized[0].lower()
         if cmd == "/add":
             # For adding portfolio entries
-            # TODO: Inline keyboard implementation without lib
-            pass
+            try:
+                symbol = other_user_inputs[0]
+                qty = float(other_user_inputs[1])
+                add_asset(chat_id, symbol, qty)
+                send_message(chat_id, "Added Asset Successfully to Portfolio.")
+            except IndexError:
+                send_message(chat_id, "Missing Ticker or Qty information, please try again.")
+            except ValueError:
+                send_message(chat_id, "Quantity must be a number!")
+            except Exception as ex:
+                send_message(chat_id, ex.message)
         elif cmd == "/update":
             # For adjusting portfolio entries
             pass
@@ -40,13 +50,13 @@ def webhook_handler():
             if portfolio == {}:
                 send_message(chat_id, "Portfolio is empty")
             else:
-                msg_to_send = "Current Portfolio ([TICKER] [QTY] [PRICE] [TOTAL VALUE] [CURRENCY]): \n\n"
+                msg_to_send = "Current Portfolio: \n\n"
                 for asset_symbol in portfolio.keys():
                     quantity = portfolio[asset_symbol]['quantity']
                     unit_price = portfolio[asset_symbol]['unit_price']
                     total_value = portfolio[asset_symbol]['total_value']
                     currency = portfolio[asset_symbol]['currency']
-                    msg_to_send + f"{asset_symbol} {quantity} {unit_price} {total_value} {currency} \n"
+                    msg_to_send = msg_to_send + f"{asset_symbol} \nQty: {quantity:.2f} \nPrice: {unit_price:.2f} {currency} \nTotal: {total_value:.2f} {currency} \n\n"
                 send_message(chat_id, msg_to_send)
         elif cmd == "/view_total":
             total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
@@ -75,30 +85,6 @@ def webhook_handler():
         else:
             current_app.logger.info("Received unknown command")
             send_message(chat_id, "I'm not quite sure what you meant. Try /help")
-    elif "callback_query" in update:
-        query = update["callback_query"]
-        chat_id = query["message"]["chat"]["id"]
-        message_id = query["message"]["message_id"]
-        data = query["data"]
-        if data.starts_with("CANCEL"):
-            pass
-        elif data.starts_with("ADD"):
-            # Extract information
-            text = query["message"].text
-            symbol = text.split()[0]
-            quantity = text.split()[1]
-            # Delegate to handler
-            status = add_asset(chat_id, symbol, quantity, data, text.split()[2])
-            # TODO: Handle the failure case or success case
-            send_message(chat_id, "Added")
-        elif data.starts_with("DELETE"):
-            # Extract information
-            text = query["message"].text
-            symbol = text.split()[0]
-            # Delegate to handler
-            status = delete_asset(chat_id, symbol, data)
-            # TODO: Handle the failure case or success case
-            send_message(chat_id, "Deleted")
 
     return "Finished Handling POST to webhook", 200
 
