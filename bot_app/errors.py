@@ -54,3 +54,11 @@ class InvalidAssetQuantity(Exception):
         self.qty = qty
         self.message = message
         super().__init__(self.message)
+
+
+class RegularMarketPriceNotFound(Exception):
+
+    def __init__(self, symbol, message="Regular Market Price and Currency information are not available for the ticker symbol."):
+        self.qty = qty
+        self.message = message
+        super().__init__(self.message)

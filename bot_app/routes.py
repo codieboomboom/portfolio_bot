@@ -61,7 +61,7 @@ def webhook_handler():
                     chat_id,
                     f"Price per unit of {symbol} is {regular_market_price_pair[0]:.2f} {regular_market_price_pair[1]}",
                 )
-            except SymbolNotSupportedError as ex:
+            except Exception as ex:
                 send_message(
                     chat_id,
                     ex.message,
@@ -102,7 +102,7 @@ def set_webhook():
     telegram_url = current_app.config["TELEGRAM_BOT_BASE_URL"] + "/setWebhook"
     webhook_url = current_app.config["WEBHOOK_URL"] + "/webhook" + "/entry"
     current_app.logger.debug(f"Setting webhook as {webhook_url}")
-    payload = {"url": webhook_url}
+    payload = {"url": webhook_url, "drop_pending_updates": True}
 
     resp = requests.post(telegram_url, data=payload)
     current_app.logger.info(f"Response for Sent request: {resp}")

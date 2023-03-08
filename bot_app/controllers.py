@@ -6,6 +6,7 @@ from bot_app.errors import (
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
     InvalidAssetQuantity,
+    RegularMarketPriceNotFound,
 )
 
 
@@ -94,6 +95,9 @@ def get_regular_market_price(symbol):
     if validate_exist_asset_supported_by_yahoo_query(symbol):
         ticker = yq.Ticker(symbol)
         resp_dict = ticker.price
+        print(resp_dict)
+        if 'regularMarketPrice' not in resp_dict[symbol] or 'currency' not in resp_dict[symbol]:
+            raise RegularMarketPriceNotFound(symbol)
         return resp_dict[symbol]["regularMarketPrice"], resp_dict[symbol]["currency"]
     else:
         # TODO: Check via other sources. For now just raise error
@@ -103,7 +107,8 @@ def get_regular_market_price(symbol):
 def validate_exist_asset_supported_by_yahoo_query(symbol):
     ticker = yq.Ticker(symbol)
     resp_dict = ticker.quote_type
-    if "quoteType" in resp_dict[symbol]:
+    print(resp_dict)
+    if 'shortName' in resp_dict[symbol] and resp_dict[symbol]['shortName'] is not None:
         return True
     else:
         return False
