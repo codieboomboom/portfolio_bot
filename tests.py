@@ -1,7 +1,8 @@
 import os
 import pytest
-from app import create_app, db, Asset
-from app.controllers import (
+from bot_app import create_app, db
+from bot_app.models import Asset
+from bot_app.controllers import (
     add_asset,
     delete_asset,
     update_asset,
@@ -9,7 +10,7 @@ from app.controllers import (
     validate_qty_positive_non_zero,
     get_regular_market_price,
 )
-from app.errors import (
+from bot_app.errors import (
     SymbolNotSupportedError,
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
