@@ -37,11 +37,17 @@ def webhook_handler():
         elif cmd == "/view_portfolio":
             # For viewing portfolio entries
             portfolio = get_assets_in_portfolio(chat_id)
-            if portfolio == []:
+            if portfolio == {}:
                 send_message(chat_id, "Portfolio is empty")
             else:
-                # TODO
-                send_message(chat_id, "Portfolio has things")
+                msg_to_send = "Current Portfolio ([TICKER] [QTY] [PRICE] [TOTAL VALUE] [CURRENCY]): \n\n"
+                for asset_symbol in portfolio.keys():
+                    quantity = portfolio[asset_symbol]['quantity']
+                    unit_price = portfolio[asset_symbol]['unit_price']
+                    total_value = portfolio[asset_symbol]['total_value']
+                    currency = portfolio[asset_symbol]['currency']
+                    msg_to_send + f"{asset_symbol} {quantity} {unit_price} {total_value} {currency} \n"
+                send_message(chat_id, msg_to_send)
         elif cmd == "/view_total":
             total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
             send_message(
