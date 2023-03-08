@@ -44,7 +44,7 @@ def webhook_handler():
         elif cmd == "/update":
             # For adjusting portfolio entries
             pass
-        elif cmd == "/view_portfolio":
+        elif cmd == "/assets":
             # For viewing portfolio entries
             portfolio = get_assets_in_portfolio(chat_id)
             if portfolio == {}:
@@ -56,13 +56,18 @@ def webhook_handler():
                     unit_price = portfolio[asset_symbol]['unit_price']
                     total_value = portfolio[asset_symbol]['total_value']
                     currency = portfolio[asset_symbol]['currency']
-                    msg_to_send = msg_to_send + f"{asset_symbol} \nQty: {quantity:.2f} \nPrice: {unit_price:.2f} {currency} \nTotal: {total_value:.2f} {currency} \n\n"
+                    msg_to_send = msg_to_send + f"{asset_symbol} \nQty: {quantity:,.2f} \nPrice: {unit_price:,.2f} {currency} \nTotal: {total_value:,.2f} {currency} \n\n"
                 send_message(chat_id, msg_to_send)
-        elif cmd == "/view_total":
-            total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
+        elif cmd == "/total":
+            if len(text_tokenized) > 1:
+                preferred_currency = other_user_inputs[0]
+                total_value_of_portfolio = get_total_worth_of_portfolio(chat_id, preferred_currency)
+                # error handling for problematic input (not currency)
+            else:
+                total_value_of_portfolio = get_total_worth_of_portfolio(chat_id)
             send_message(
                 chat_id,
-                f"Total Portfolio Value: {total_value_of_portfolio[0]:.2f} {total_value_of_portfolio[1]} ",
+                f"Total Portfolio Value: {total_value_of_portfolio[0]:,.2f} {total_value_of_portfolio[1]} ",
             )
         elif cmd == "/delete":
             # For deleting portfolio entries
@@ -75,7 +80,7 @@ def webhook_handler():
                 regular_market_price_pair = get_regular_market_price(symbol)
                 send_message(
                     chat_id,
-                    f"Price per unit of {symbol} is {regular_market_price_pair[0]:.2f} {regular_market_price_pair[1]}",
+                    f"Price per unit of {symbol} is {regular_market_price_pair[0]:,.2f} {regular_market_price_pair[1]}",
                 )
             except Exception as ex:
                 send_message(

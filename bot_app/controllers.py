@@ -72,9 +72,9 @@ def get_total_worth_of_portfolio(chat_id, base_currency="USD"):
     # TODO: unit test
     assets = get_assets_in_portfolio(chat_id)
     total_worth = 0
-    for asset in assets:
-        asset_worth = asset[3]
-        asset_worth_currency = asset[4]
+    for asset_symbol in assets.keys():
+        asset_worth = assets[asset_symbol]['total_value']
+        asset_worth_currency = assets[asset_symbol]['currency']
         if asset_worth_currency != base_currency:
             asset_worth = (
                 asset_worth * get_exchange_rate(asset_worth_currency, base_currency)[0]
@@ -113,5 +113,9 @@ def validate_qty_positive_non_zero(qty):
 
 
 def get_exchange_rate(src_currency, dst_currency):
-    symbol = src_currency + dst_currency + "=X"
+    if src_currency == 'USD':
+        symbol = dst_currency + "=X"
+    else:
+        symbol = src_currency + dst_currency + "=X"
+    # TODO: Custom error for failed exchange
     return get_regular_market_price(symbol)
