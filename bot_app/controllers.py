@@ -54,24 +54,17 @@ def update_asset(chat_id, symbol, quantity):
 def get_assets_in_portfolio(chat_id):
     # TODO: unit test
     # TODO: Need some form of serializer to quickly produce json level?
-    result = []
+    result = {}
     all_assets_in_portfolio = db.session.query(Asset).filter_by(chat_id=chat_id).all()
     for asset_object in all_assets_in_portfolio:
-        asset_unit_price_pair = get_regular_market_price(asset_symbol)
         asset_symbol = asset_object.symbol
-        asset_qty = asset.quantity
+        asset_qty = asset_object.quantity
+        asset_unit_price_pair = get_regular_market_price(asset_symbol)
         asset_unit_price = asset_unit_price_pair[0]
         price_currency = asset_unit_price_pair[1]
         asset_total_value = asset_qty * asset_unit_price
-        result.append(
-            (
-                asset_symbol,
-                asset_qty,
-                asset_unit_price,
-                asset_total_value,
-                price_currency,
-            )
-        )
+        result[asset_symbol] = {'quantity': asset_qty, 'unit_price':asset_unit_price, 'total_value':asset_total_value, 'currency':price_currency}
+    
     return result
 
 
