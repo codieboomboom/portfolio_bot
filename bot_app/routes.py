@@ -19,8 +19,7 @@ webhook_bp = Blueprint("webhook_api", __name__)
 @webhook_bp.route("/webhook/entry", methods=["POST"])
 def webhook_handler():
     update = request.get_json()
-    current_app.logger.info("Received new update via webhook!")
-    current_app.logger.debug(update)
+    current_app.logger.debug(f"TELEGRAM UPDATE: {update}")
     if "message" in update:
         message = update["message"]
         chat_id = message["chat"]["id"]
@@ -28,7 +27,7 @@ def webhook_handler():
         if len(text_tokenized) > 1:
             other_user_inputs = text_tokenized[1:]
         else:
-            other_user_inputs=[]
+            other_user_inputs = []
         cmd = text_tokenized[0].lower()
         if cmd == "/add":
             # For adding portfolio entries
@@ -115,31 +114,32 @@ def webhook_handler():
                     ex.message,
                 )
         else:
-            current_app.logger.info("Received unknown command")
             send_message(chat_id, "I'm not quite sure what you meant. Try /help")
 
-    return "Finished Handling POST to webhook", 200
+    return "OK", 200
 
 
 @webhook_bp.route("/webhook/set", methods=["POST"])
 def set_webhook():
     telegram_url = current_app.config["TELEGRAM_BOT_BASE_URL"] + "/setWebhook"
     webhook_url = current_app.config["WEBHOOK_URL"] + "/webhook" + "/entry"
-    current_app.logger.debug(f"Setting webhook as {webhook_url}")
+    current_app.logger.debug(f"TELEGRAM URL TO SEND REQ: {telegram_url}")
+    current_app.logger.debug(f"WEBHOOK SET TO: {webhook_url}")
+    
     payload = {"url": webhook_url, "drop_pending_updates": True}
 
     resp = requests.post(telegram_url, data=payload)
-    current_app.logger.info(f"Response for Sent request: {resp}")
+    current_app.logger.debug(f"WEBHOOK SET RESULT: {resp}")
 
-    return "Done", 200
+    return "OK", 200
 
 
 @webhook_bp.route("/webhook/delete", methods=["POST"])
 def delete_webhook():
     telegram_url = current_app.config["TELEGRAM_BOT_BASE_URL"] + "/deleteWebhook"
-    current_app.logger.debug(f"Deleting webhook")
+    current_app.logger.debug(f"TELEGRAM URL TO SEND REQ: {telegram_url}")
 
     resp = requests.post(telegram_url)
-    current_app.logger.info(f"Response for Sent request: {resp}")
+    current_app.logger.info(f"WEBHOOK DELETE RESULT: {resp}")
 
-    return "Done", 200
+    return "OK", 200

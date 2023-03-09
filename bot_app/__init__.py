@@ -27,7 +27,7 @@ def create_app(config=DevConfig):
     # Note that we can do away with blueprint too but need to put routes code here, then @app.route can work
     app.register_blueprint(webhook_bp)
 
-    app.logger.debug(f"Running with Config {app.config}")
+    app.logger.debug(f"Running with Config: {app.config}")
 
     return app
 
