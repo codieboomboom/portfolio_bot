@@ -2,12 +2,13 @@ import requests
 from flask import current_app
 
 error_message_prefix = {
-    "/add": "Add asset to Portfolio Failed.",
-    "/delete": "Remove asset from Portfolio Failed.",
+    "/add": "Add asset to portfolio failed.",
+    "/delete": "Remove asset from portfolio failed.",
     "/update": "Failed to change asset entry.",
     "/price": "Failed to get price.",
     "/assets": "Failed to get portfolio.",
     "/total": "Failed to get total value of portfolio.",
+    "/clear": "Failed to clear portfolio."
 }
 
 

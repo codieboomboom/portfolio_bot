@@ -67,3 +67,9 @@ class RegularMarketPriceNotFound(Exception):
         self.qty = qty
         self.message = message
         super().__init__(self.message)
+
+
+class PortfolioAlreadyEmpty(Exception):
+    def __init__(self, message="Portfolio is empty."):
+        self.message = message
+        super().__init__(self.message)

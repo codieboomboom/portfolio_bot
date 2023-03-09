@@ -7,6 +7,7 @@ from bot_app.errors import (
     SymbolNotExistedInPortfolioError,
     InvalidAssetQuantity,
     RegularMarketPriceNotFound,
+    PortfolioAlreadyEmpty
 )
 
 
@@ -35,6 +36,14 @@ def delete_asset(chat_id, symbol):
     db.session.delete(first_existing_asset_with_symbol_in_portfolio)
     db.session.commit()
 
+
+def delete_portfolio(chat_id):
+    portfolio = (db.session.query(Asset).filter_by(chat_id=chat_id).all())
+    if not portfolio:
+        raise PortfolioAlreadyEmpty()
+    for asset in portfolio:
+        db.session.delete(asset)
+    db.session.commit()
 
 def update_asset(chat_id, symbol, quantity):
     if not validate_exist_asset_supported_by_yahoo_query(symbol):

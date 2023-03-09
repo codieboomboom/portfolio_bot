@@ -5,6 +5,7 @@ from bot_app.models import Asset
 from bot_app.controllers import (
     add_asset,
     delete_asset,
+    delete_portfolio,
     update_asset,
     validate_exist_asset_supported_by_yahoo_query,
     validate_qty_positive_non_zero,
@@ -17,6 +18,7 @@ from bot_app.errors import (
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
     InvalidAssetQuantity,
+    PortfolioAlreadyEmpty
 )
 from config import TestConfig
 
@@ -179,6 +181,19 @@ def test_delete_asset_that_was_deleted_failed(client):
     assert asset_deleted is None
     with pytest.raises(SymbolNotExistedInPortfolioError):
         delete_asset(chat_id=123, symbol="INTL")
+
+
+""" UNIT TESTS FOR DELETE WHOLE PORTFOLIO """
+def test_delete_whole_portfolio_pass(client):
+    assets_before = Asset.query.filter_by(chat_id=123).all()
+    assert assets_before
+    delete_portfolio(chat_id=123)
+    assets_after = Asset.query.filter_by(chat_id=123).all()
+    assert not assets_after
+
+def test_delete_whole_portfolio_empty_failed(client):
+    with pytest.raises(PortfolioAlreadyEmpty):
+        delete_portfolio(chat_id=125)
 
 
 """ UNIT TESTS FOR VIEW_PORTFOLIO """

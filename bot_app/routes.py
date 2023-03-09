@@ -9,6 +9,7 @@ from bot_app.controllers import (
     get_assets_in_portfolio,
     get_exchange_rate,
     get_total_worth_of_portfolio,
+    delete_portfolio
 )
 from bot_app.utils import send_message, handle_exception_and_send_message
 from bot_app.errors import SymbolNotSupportedError
@@ -74,6 +75,10 @@ def webhook_handler():
                 symbol = other_user_inputs[0].upper()
                 delete_asset(chat_id, symbol)
                 send_message(chat_id, f"Deleted {symbol} Successfully from Portfolio.")
+            elif cmd == "/clear":
+                # For empty/clear portfolio entries
+                delete_portfolio(chat_id)
+                send_message(chat_id, f"Deleted all entries in portfolio.")
             elif cmd == "/price":
                 # Check for unit price of ticket
                 symbol = other_user_inputs[0].upper()
