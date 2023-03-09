@@ -9,7 +9,7 @@ from bot_app.controllers import (
     get_assets_in_portfolio,
     get_exchange_rate,
     get_total_worth_of_portfolio,
-    delete_portfolio
+    delete_portfolio,
 )
 from bot_app.utils import send_message, handle_exception_and_send_message
 from bot_app.errors import SymbolNotSupportedError

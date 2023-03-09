@@ -18,7 +18,7 @@ from bot_app.errors import (
     SymbolExistedInPortfolioError,
     SymbolNotExistedInPortfolioError,
     InvalidAssetQuantity,
-    PortfolioAlreadyEmpty
+    PortfolioAlreadyEmpty,
 )
 from config import TestConfig
 
@@ -184,12 +184,15 @@ def test_delete_asset_that_was_deleted_failed(client):
 
 
 """ UNIT TESTS FOR DELETE WHOLE PORTFOLIO """
+
+
 def test_delete_whole_portfolio_pass(client):
     assets_before = Asset.query.filter_by(chat_id=123).all()
     assert assets_before
     delete_portfolio(chat_id=123)
     assets_after = Asset.query.filter_by(chat_id=123).all()
     assert not assets_after
+
 
 def test_delete_whole_portfolio_empty_failed(client):
     with pytest.raises(PortfolioAlreadyEmpty):

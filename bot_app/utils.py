@@ -8,7 +8,7 @@ error_message_prefix = {
     "/price": "Failed to get price.",
     "/assets": "Failed to get portfolio.",
     "/total": "Failed to get total value of portfolio.",
-    "/clear": "Failed to clear portfolio."
+    "/clear": "Failed to clear portfolio.",
 }
 
 
