@@ -29,13 +29,13 @@ def webhook_handler():
         try:
             if cmd == "/add":
                 # For adding portfolio entries
-                symbol = other_user_inputs[0]
+                symbol = other_user_inputs[0].upper()
                 qty = float(other_user_inputs[1])
                 add_asset(chat_id, symbol, qty)
                 send_message(chat_id, "Added Asset Successfully to Portfolio.")
             elif cmd == "/update":
                 # For adjusting portfolio entries
-                symbol = other_user_inputs[0]
+                symbol = other_user_inputs[0].upper()
                 qty = float(other_user_inputs[1])
                 update_asset(chat_id, symbol, qty)
                 send_message(chat_id, "Update Asset Successfully.")
@@ -58,7 +58,7 @@ def webhook_handler():
                     send_message(chat_id, msg_to_send)
             elif cmd == "/total":
                 if other_user_inputs:
-                    preferred_currency = other_user_inputs[0]
+                    preferred_currency = other_user_inputs[0].upper()
                     total_value_of_portfolio = get_total_worth_of_portfolio(
                         chat_id, preferred_currency
                     )
@@ -71,12 +71,12 @@ def webhook_handler():
                 )
             elif cmd == "/delete":
                 # For deleting portfolio entries
-                symbol = other_user_inputs[0]
+                symbol = other_user_inputs[0].upper()
                 delete_asset(chat_id, symbol)
                 send_message(chat_id, f"Deleted {symbol} Successfully from Portfolio.")
             elif cmd == "/price":
                 # Check for unit price of ticket
-                symbol = other_user_inputs[0]
+                symbol = other_user_inputs[0].upper()
                 regular_market_price_pair = get_regular_market_price(symbol)
                 send_message(
                     chat_id,
