@@ -7,7 +7,7 @@ class SymbolNotSupportedError(Exception):
     """
 
     def __init__(
-        self, symbol, message="Symbol does not exist or not supported by our Bot"
+        self, symbol, message="Ticker symbol does not exist or not supported by our Bot"
     ):
         self.symbol = symbol
         self.message = message
@@ -22,7 +22,9 @@ class SymbolExistedInPortfolioError(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, symbol, message="Symbol already existed in your portfolio"):
+    def __init__(
+        self, symbol, message="Ticker symbol already existed in your portfolio"
+    ):
         self.symbol = symbol
         self.message = message
         super().__init__(self.message)
@@ -36,7 +38,7 @@ class SymbolNotExistedInPortfolioError(Exception):
         message -- explanation of the error
     """
 
-    def __init__(self, symbol, message="Symbol not found in your portfolio"):
+    def __init__(self, symbol, message="Ticker symbol not found in your portfolio"):
         self.symbol = symbol
         self.message = message
         super().__init__(self.message)
@@ -60,7 +62,7 @@ class RegularMarketPriceNotFound(Exception):
     def __init__(
         self,
         symbol,
-        message="Regular Market Price and Currency information are not available for the ticker symbol.",
+        message="Ticker's regular market price not found.",
     ):
         self.qty = qty
         self.message = message

@@ -1,6 +1,15 @@
 import requests
 from flask import current_app
 
+error_message_prefix = {
+    "/add": "Add asset to Portfolio Failed.",
+    "/delete": "Remove asset from Portfolio Failed.",
+    "/update": "Failed to change asset entry.",
+    "/price": "Failed to get price.",
+    "/assets": "Failed to get portfolio.",
+    "/total": "Failed to get total value of portfolio.",
+}
+
 
 # Send message to Telegram chat with chat_id
 def send_message(chat_id, text, reply_markup=None):
@@ -16,3 +25,18 @@ def send_message(chat_id, text, reply_markup=None):
         current_app.logger.info(f"Error sending message to {chat_id}: {response.text}")
 
     return "Done"
+
+
+# Handler for errors and send messages to user
+def handle_exception_and_send_message(chat_id, command, ex):
+    if ex == IndexError:
+        send_message(
+            chat_id,
+            f"{error_message_prefix[command]} Missing Ticker or Qty information, please try again.",
+        )
+    elif ex == ValueError:
+        send_message(
+            chat_id, f"{error_message_prefix[command]} Quantity must be a number!"
+        )
+    else:
+        send_message(chat_id, f"{error_message_prefix[command]} {ex.message}")
