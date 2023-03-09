@@ -171,8 +171,14 @@ def test_delete_asset_does_not_delete_other_assets_in_other_user_portfolio_pass(
 
 
 def test_delete_asset_that_was_deleted_failed(client):
-    # TODO:
-    pass
+    # Basically test the non-idempotence of the function
+    existed_asset_to_delete = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    assert existed_asset_to_delete is not None
+    delete_asset(chat_id=123, symbol="INTL")
+    asset_deleted = Asset.query.filter_by(chat_id=123, symbol="INTL").first()
+    assert asset_deleted is None
+    with pytest.raises(SymbolNotExistedInPortfolioError):
+        delete_asset(chat_id=123, symbol="INTL")
 
 
 """ UNIT TESTS FOR VIEW_PORTFOLIO """
@@ -209,7 +215,6 @@ def test_update_asset_not_exist_in_portfolio_failed(client):
 
 
 def test_update_asset_not_supported_failed(client):
-    # TODO: necessary?
     with pytest.raises(SymbolNotSupportedError):
         update_asset(chat_id=123, symbol="BGFERFDSFS", quantity=10)
 
@@ -265,6 +270,7 @@ def test_update_asset_not_change_other_users_portfolio_assets(client):
 
 
 def test_update_asset_dcds(client):
+    # TODO
     pass
 
 
