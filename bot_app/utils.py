@@ -29,12 +29,12 @@ def send_message(chat_id, text, reply_markup=None):
 
 # Handler for errors and send messages to user
 def handle_exception_and_send_message(chat_id, command, ex):
-    if ex == IndexError:
+    if isinstance(ex, IndexError):
         send_message(
             chat_id,
             f"{error_message_prefix[command]} Missing Ticker or Qty information, please try again.",
         )
-    elif ex == ValueError:
+    elif isinstance(ex, ValueError):
         send_message(
             chat_id, f"{error_message_prefix[command]} Quantity must be a number!"
         )
