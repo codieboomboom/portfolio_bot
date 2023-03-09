@@ -124,4 +124,8 @@ def get_exchange_rate(src_currency, dst_currency):
     else:
         symbol = src_currency + dst_currency + "=X"
     # TODO: Custom error for failed exchange
-    return get_regular_market_price(symbol)
+    try:
+        exchange_rate = get_regular_market_price(symbol)
+    except SymbolNotSupportedError as ex:
+        ex.message = "Requested currency not supported, cannot get exchange rate."
+        raise ex
