@@ -23,3 +23,11 @@ class TestConfig:
 
     def __repr__(self):
         return f"Config for testing"
+
+
+class ProductionConfig:
+    SQLALCHEMY_DATABASE_URI = os.environ.get(
+        "DATABASE_URL"
+    ) or "sqlite:///" + os.path.join(basedir, "production.db")
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    TELEGRAM_BOT_BASE_URL = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
