@@ -19,4 +19,5 @@ RUN conda activate telegram \
 ENV PATH /opt/conda/envs/telegram/bin:$PATH
 
 # Set the default conda environment
+Run echo "unset SUDO_UID SUDO_GID SUDO_USER" >> ~/.bashrc
 RUN echo "conda activate telegram" >> ~/.bashrc
