@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from config import DevConfig
 import logging
+import boto3
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -19,9 +20,13 @@ def create_app(config=DevConfig):
     )
     app.logger.setLevel(logging.DEBUG)
 
-    # Initialize extensions
-    db.init_app(app)
-    migrate.init_app(app, db)
+    if 'dynamodb://' in app.config['SQLALCHEMY_DATABASE_URI']:
+        dynamodb = boto3.resource('dynamodb', region_name='us-east-1')
+        table_name = app.config['SQLALCHEMY_DATABASE_URI'].split('dynamodb://')[1]
+        table = dynamodb.Table(table_name)
+    else:
+        db.init_app(app)
+        migrate.init_app(app, db)
 
     # blueprint register
     # Note that we can do away with blueprint too but need to put routes code here, then @app.route can work
